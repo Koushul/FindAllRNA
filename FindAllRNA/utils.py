@@ -3,7 +3,7 @@ from Bio.SeqRecord import SeqRecord
 import numpy as np
 from sklearn.utils import shuffle
 
-from encoders import NoisyEncoder
+from encoders import NoisyEncoder, DummySeqEncoder, DummyFastaEncoder, AbstractSequenceEncoder, AbstractFastaEncoder
 
 
 # Rfam families and their classes
@@ -28,21 +28,21 @@ rRNA = ['RF00001', 'RF00002']
 
 tRNA = ['RF00005', 'RF01852']
 
-lookup = {}
+rfam_lookup = {}
 for i in snRNA:
-    lookup[i] = 'snRNA'
+    rfam_lookup[i] = 'snRNA'
 for i in cis_reg:
-    lookup[i] = 'cis_reg'
+    rfam_lookup[i] = 'cis_reg'
 for i in miRNA:
-    lookup[i] = 'miRNA'
+    rfam_lookup[i] = 'miRNA'
 for i in sRNA:
-    lookup[i] = 'sRNA'
+    rfam_lookup[i] = 'sRNA'
 for i in Intron:
-    lookup[i] = 'intron'
+    rfam_lookup[i] = 'intron'
 for i in rRNA:
-    lookup[i] = 'rRNA'
+    rfam_lookup[i] = 'rRNA'
 for i in tRNA:
-    lookup[i] = 'tRNA'
+    rfam_lookup[i] = 'tRNA'
 
 
 def get_labels(fasta_file: str) -> list:
@@ -69,6 +69,19 @@ class DataLoader(object):
         self.train_labels = get_labels(x_train)
         self.val_labels = get_labels(x_val)
         self.test_labels = get_labels(x_test)
+        
+        # self.seq_encoder = DummySeqEncoder()
+        # self.fasta_encoder = DummyFastaEncoder()
+        
+    def attach_sequence_encoder(self, encoder: AbstractSequenceEncoder):
+        assert isinstance(encoder, AbstractSequenceEncoder)
+        self.seq_encoder = encoder
+        
+    
+    def attach_fasta_encoder(self, encoder: AbstractFastaEncoder):
+        assert isinstance(encoder, AbstractFastaEncoder)
+        self.fasta_encoder = encoder
+        
         
     def generate_training_data(self, noise: float = None):
         data, labels = shuffle(self.noise_encoder_train.encode(noise or self.default_noise), self.train_labels)  

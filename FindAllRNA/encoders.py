@@ -22,6 +22,21 @@ class AbstractSequenceEncoder:
     
 class AbstractFastaEncoder(AbstractSequenceEncoder):
     pass
+
+class DummySeqEncoder(AbstractSequenceEncoder):
+    
+    def encode(self, seq: Seq):
+        return seq
+    
+    
+class DummyFastaEncoder(AbstractSequenceEncoder):
+    
+    def __init__(self, fasta_file: str):
+        self.fasta_file = fasta_file
+    
+    def encode(self):
+        seq_rec = list(SeqIO.parse(self.fasta_file, "fasta"))
+        return seq_rec
     
 class NoisyEncoder(AbstractFastaEncoder):
     
