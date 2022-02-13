@@ -71,7 +71,7 @@ class RandomEncoder(AbstractFastaEncoder):
                 np.random.shuffle(sw)
                 ss = Seq(''.join(sw))
                 self.archieve[r.seq].add((ss, r.name))
-                samples.append(ss)
+                samples.append(str(ss.seq))
         return samples
         
     def decode(self, seq):
@@ -95,6 +95,9 @@ class KMerEncoder(AbstractSequenceEncoder):
         Returns an integer encoding of the sequence of shape (k, n)
         Window skips instead of sliding
         """
+    
+        seq = seq[:self.n]
+        
         if self.padding == 'random':
             seqr = np.random.randint(len(self.ALLOWED_CHARACTERS), size=self.n)
         elif self.padding == 'constant':
@@ -119,6 +122,8 @@ class OneHotEncoder(AbstractSequenceEncoder):
         self.char_to_int = dict((c, i) for i, c in enumerate(self.kmers)) #encodings
     
     def encode(self, seq: Seq):
+        
+        seq = seq[:self.n]
         
         if self.padding == 'random':
             seqr = np.random.randint(len(self.ALLOWED_CHARACTERS), size=self.n)
