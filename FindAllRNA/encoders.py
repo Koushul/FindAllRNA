@@ -13,8 +13,6 @@ from tensorflow import keras
 from collections import defaultdict
 
 class AbstractSequenceEncoder:
-    
-    
     ALLOWED_CHARACTERS = 'ATGC'
     
     def encode(self, seq: Seq):
@@ -23,8 +21,10 @@ class AbstractSequenceEncoder:
     def decode(self):
         raise NotImplementedError   
     
+class AbstractFastaEncoder(AbstractSequenceEncoder):
+    pass
     
-class NoisyEncoder(AbstractSequenceEncoder):
+class NoisyEncoder(AbstractFastaEncoder):
     
     def __init__(self, fasta_file: str):
         self.fasta_file = fasta_file
@@ -39,17 +39,17 @@ class NoisyEncoder(AbstractSequenceEncoder):
         for i, r in enumerate(seq_rec):
             head = ''
             tail = ''
-            if (nperc>0):
+            if nperc > 0:
                 sw = wrap(str(r.seq), 2) + wrap(str(r.seq)[1:], 2)
                 head = np.random.choice(sw, int(0.25*len(r.seq)*nperc/100))
                 tail = np.random.choice(sw, int(0.25*len(r.seq)*nperc/100))            
                 head = ''.join(head)
                 tail = ''.join(tail)
             samples.append(head+r.seq+tail)
-        return samples
+        return np.array(samples)
     
     
-class RandomEncoder(AbstractSequenceEncoder):
+class RandomEncoder(AbstractFastaEncoder):
     
     def __init__(self, fasta_file: str):
         self.fasta_file = fasta_file
@@ -92,7 +92,6 @@ class KMerEncoder(AbstractSequenceEncoder):
         
     
     def encode(self, seq: Seq, return_simple: bool = False):
-
         """
         Returns an integer encoding of the sequence of shape (k, n)
         Window skips instead of sliding
@@ -111,7 +110,6 @@ class KMerEncoder(AbstractSequenceEncoder):
         
         cat_seqr = keras.utils.to_categorical(seqr)
         return cat_seqr
-    
     
 class OneHotEncoder(AbstractSequenceEncoder):
     
