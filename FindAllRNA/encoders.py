@@ -44,7 +44,7 @@ class NoisyEncoder(AbstractFastaEncoder):
                 tail = np.random.choice(sw, int(0.25*len(r.seq)*nperc/100))            
                 head = ''.join(head)
                 tail = ''.join(tail)
-            samples.append(head+str(r.seq)+tail)
+            samples.append(head+str(r)+tail)
         return np.array(samples)
     
     
