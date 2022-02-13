@@ -1,5 +1,4 @@
 
-from os import set_blocking
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -45,7 +44,7 @@ class NoisyEncoder(AbstractFastaEncoder):
                 tail = np.random.choice(sw, int(0.25*len(r.seq)*nperc/100))            
                 head = ''.join(head)
                 tail = ''.join(tail)
-            samples.append(head+r.seq+tail)
+            samples.append(head+str(r.seq)+tail)
         return np.array(samples)
     
     
@@ -91,7 +90,7 @@ class KMerEncoder(AbstractSequenceEncoder):
         self.char_to_int = dict((c, i) for i, c in enumerate(self.kmers)) #encodings
         
     
-    def encode(self, seq: Seq, return_simple: bool = False):
+    def encode(self, seq: Seq):
         """
         Returns an integer encoding of the sequence of shape (k, n)
         Window skips instead of sliding
@@ -102,14 +101,12 @@ class KMerEncoder(AbstractSequenceEncoder):
             seqr = np.zeros(self.n)
             
         data = wrap(str(seq), self.k)
+        data = [d for d in data if len(d) == self.k]
         integer_encoded = [self.char_to_int[c] for c in data]    
         seqr[0:len(integer_encoded)] = integer_encoded
         
-        if return_simple:
-            return seqr
+        return seqr
         
-        cat_seqr = keras.utils.to_categorical(seqr)
-        return cat_seqr
     
 class OneHotEncoder(AbstractSequenceEncoder):
     
@@ -121,7 +118,7 @@ class OneHotEncoder(AbstractSequenceEncoder):
         self.kmers = [''.join(x) for x in itertools.product(self.ALLOWED_CHARACTERS, repeat=self.k)] #all possible kmers
         self.char_to_int = dict((c, i) for i, c in enumerate(self.kmers)) #encodings
     
-    def encode(self, seq: Seq, return_simple: bool = False):
+    def encode(self, seq: Seq):
         
         if self.padding == 'random':
             seqr = np.random.randint(len(self.ALLOWED_CHARACTERS), size=self.n)
@@ -132,11 +129,8 @@ class OneHotEncoder(AbstractSequenceEncoder):
         integer_encoded = [self.char_to_int[c] for c in data]
         seqr[0:len(integer_encoded)] = integer_encoded
         
-        if return_simple:
-            return seqr
-        
-        cat_seqr = keras.utils.to_categorical(seqr)        
-        return cat_seqr
+        return seqr
+
                 
 
 
