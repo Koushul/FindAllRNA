@@ -25,6 +25,10 @@ class DataLoader(object):
         self.val_labels = get_labels(self.x_val)
         self.test_labels = get_labels(self.x_test)
         
+        
+        
+        
+        
     
     # def
     #     bn = 25
