@@ -5,11 +5,10 @@ import warnings
 from encoders import AbstractSequenceEncoder
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-from multipledispatch import dispatch
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
-from tensorflow.python.keras.backend import GraphExecutionFunction
+# from tensorflow.python.keras.backend import GraphExecutionFunction
 
 from tensorflow.keras.layers import LeakyReLU
 import logging
@@ -149,43 +148,43 @@ def buildCNNModelImproved2D(inshape,num_classes):
     return model
 
 
-class EntropyClassifier:
-    def __init__(self, model: GraphExecutionFunction, encoder: AbstractSequenceEncoder, classes: list, threshold: float):
+# class EntropyClassifier:
+#     def __init__(self, model: GraphExecutionFunction, encoder: AbstractSequenceEncoder, classes: list, threshold: float):
         
-        assert isinstance(model, GraphExecutionFunction)
-        assert isinstance(encoder, AbstractSequenceEncoder)
-        assert isinstance(classes, list)
-        assert isinstance(threshold, float)
+#         assert isinstance(model, GraphExecutionFunction)
+#         assert isinstance(encoder, AbstractSequenceEncoder)
+#         assert isinstance(classes, list)
+#         assert isinstance(threshold, float)
         
-        self.T = threshold
-        self.model = model
-        self.encoder = encoder
-        self.classes = classes
+#         self.T = threshold
+#         self.model = model
+#         self.encoder = encoder
+#         self.classes = classes
         
         
-    def _calculate_entropy(self, test_seqs, iterations):
-        avrp_rnd = np.zeros((len(test_seqs), len(self.classes)))
-        avrhp_rnd = np.zeros((len(test_seqs)))
+#     def _calculate_entropy(self, test_seqs, iterations):
+#         avrp_rnd = np.zeros((len(test_seqs), len(self.classes)))
+#         avrhp_rnd = np.zeros((len(test_seqs)))
         
-        for _ in range(iterations):
-            preds_rnd = self.model([test_seqs,1])
-            avrp_rnd = avrp_rnd + preds_rnd[0]
-            avrhp_rnd = avrhp_rnd + np.sum(-preds_rnd[0]*np.log2(preds_rnd[0]+1e-10),1)
+#         for _ in range(iterations):
+#             preds_rnd = self.model([test_seqs,1])
+#             avrp_rnd = avrp_rnd + preds_rnd[0]
+#             avrhp_rnd = avrhp_rnd + np.sum(-preds_rnd[0]*np.log2(preds_rnd[0]+1e-10),1)
             
-        avrp_rnd = avrp_rnd/iterations
-        avrhp_rnd = avrhp_rnd/iterations
-        hp_rnd = np.sum(-avrp_rnd*np.log2(avrp_rnd+1e-10),1)
+#         avrp_rnd = avrp_rnd/iterations
+#         avrhp_rnd = avrhp_rnd/iterations
+#         hp_rnd = np.sum(-avrp_rnd*np.log2(avrp_rnd+1e-10),1)
         
-        return hp_rnd
+#         return hp_rnd
     
 
-    def predict(self, test_seqs):
-        """
-        Predicts if given RNA sequences are functional (non-coding) or non-function.
-        Returns 1 for functional RNAs and 0 for non-functional.
-        """
-        entropies = self._calculate_entropy(test_seqs, iterations=50)
-        return np.where(entropies > self.T, 0, 1)
+#     def predict(self, test_seqs):
+#         """
+#         Predicts if given RNA sequences are functional (non-coding) or non-function.
+#         Returns 1 for functional RNAs and 0 for non-functional.
+#         """
+#         entropies = self._calculate_entropy(test_seqs, iterations=50)
+#         return np.where(entropies > self.T, 0, 1)
     
     
 
