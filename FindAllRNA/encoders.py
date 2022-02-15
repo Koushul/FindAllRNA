@@ -59,7 +59,7 @@ class NoisyEncoder(AbstractFastaEncoder):
                 tail = np.random.choice(sw, int(0.25*len(r.seq)*nperc/100))            
                 head = ''.join(head)
                 tail = ''.join(tail)
-            samples.append(head+str(r)+tail)
+            samples.append(head+str(r.seq)+tail)
         return np.array(samples)
     
     
@@ -105,7 +105,7 @@ class KMerEncoder(AbstractSequenceEncoder):
         self.char_to_int = dict((c, i) for i, c in enumerate(self.kmers)) #encodings
         
     
-    def encode(self, seq: Seq):
+    def encode(self, seq):
         """
         Returns an integer encoding of the sequence of shape (k, n)
         Window skips instead of sliding
