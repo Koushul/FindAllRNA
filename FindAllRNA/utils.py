@@ -1,7 +1,6 @@
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 import numpy as np
-import requests
 from sklearn.utils import shuffle
 from tensorflow.keras import Sequential
 import tensorflow.keras.backend as K
