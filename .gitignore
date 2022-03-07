@@ -40,3 +40,5 @@ vignettes/*.pdf
 
 
 FindAllRNA/__pycache__
+.DS_Store
+
