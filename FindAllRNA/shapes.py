@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# coding: utf-8
+### Adapted from https://github.com/cschu/biolib/blob/master/mdg_dt.py
 
 import sys
 
@@ -35,9 +34,7 @@ CT_PRE = 5
 
 DEFOUT = open('/dev/null', 'w')
 
-###
 def check_relationship(contact1, contact2):
-    # print contact1, contact2
     """ undecided """
     crel = CT_IGN
     sid1, sid2 = contact1[0], contact1[1]
@@ -70,10 +67,7 @@ def check_relationship(contact1, contact2):
     if crel == CT_IGN: print(contact1, contact2)
     return crel
 
-###
 class MDG_Stem :
-
-    ###
     def __init__(self, contact=None, parent=None):
 
         self.contacts = []
@@ -91,7 +85,6 @@ class MDG_Stem :
         
         return None
 
-    ###
     def grow(self, contact, insertBack=True):
         if insertBack :
             self.ss_contacts.append(contact)            
@@ -100,12 +93,10 @@ class MDG_Stem :
             
         return 0
 
-    ###
     def add_child(self, stem):
         self.children.append(stem)
         return 0
 
-    ###
     def set_parent(self, stem, override=False):
         set = False
         if self.parent == None or override:
@@ -114,7 +105,6 @@ class MDG_Stem :
             pass
         return set
 
-    ###
     def opening_pair(self):
         pair = None
         if len(self.ss_contacts) != 0:
@@ -122,31 +112,25 @@ class MDG_Stem :
             pass
         return pair
 
-    ###
     def closing_pair(self):
         pair = None
         if len(self.ss_contacts) != 0:
             pair = self.ss_contacts[-1]
             pass
         return pair
-
-    ###
+    
     def is_root(self):
         return self.parent == None
-
-    ###
+    
     def is_leaf(self) :
         return len(self.children) == 0
 
-    ###
     def is_internal(self):
         return not self.is_leaf()
 
-    ###
     def has_siblings(self):
         return len( self.parent.children ) > 1
 
-    ###
     def size(self):
         return len(self.ss_contacts)
 
@@ -171,15 +155,13 @@ class MDG_Stem :
         return None
 
     def has_tertiary_pairs(self):
-        # print 'HTE', len(self.te_contacts) > 0
         return len(self.te_contacts) > 0
 
     def has_tertiary_stem(self, min_stemsize=2):
         self.te_contacts.sort()
         i = 1
         stem = self.te_contacts[0:1]
-        #print stem
-        #print self.te_contacts
+        
         while i < len(self.te_contacts):
             
             p1, p2 = stem[-1], self.te_contacts[i]
@@ -193,20 +175,6 @@ class MDG_Stem :
             pass
         return False
             
-            
-
-
-    ###
-    def __repr__(self):
-        ret = 'Dummy Stem'
-        if len(self.ss_contacts) > 0:
-            ret = '[ %s - %s ], %i bp\n' % \
-                  (self.ss_contacts[0], self.ss_contacts[-1],
-                   len(self.ss_contacts))
-            pass
-        return ret
-
-    ###
     def get_stem_bases(self, contacts, max_stemsize=9999) :
         bases = []
         n = 0
@@ -219,7 +187,6 @@ class MDG_Stem :
 
         return bases
 
-    ###
     def get_unpaired_bases(self, start, end, mdic) :
         bases = []
         for i in range(start, end) :
@@ -227,28 +194,21 @@ class MDG_Stem :
             pass
         return bases
 
-    ###
     def assemble(self, contacts, outp=DEFOUT, min_stemsize=2):
-
-        # print contacts
         ss_contacts = []
         nonss_contacts = []
 
         active_stem = self
         for c in contacts:
-            # print c
             if True:
                 if active_stem and active_stem.is_root():
-                    # print 'XXX', c
                     stem = MDG_Stem(c, active_stem)
                     outp.write('New root-child: %s\n' % str(stem))
                     active_stem = stem
-                    # print active_stem
                     ss_contacts.append(c)                    
                 else:
                     acp = active_stem.closing_pair()
                     crel = check_relationship(acp, c)
-                    # print 'CREL', crel, acp, c
 
                     if crel == CT_STA:
                         """  contact STAcks on active_stem """
@@ -275,10 +235,8 @@ class MDG_Stem :
                             active_stem is single pair
                             traceback to parent
                             """
-                            # weird format - why?
                             tmpc = [active_stem.closing_pair()]
                             stem = MDG_Stem(c, active_stem.parent)
-                            # was -2 for whatever reason...
                             del active_stem.parent.children[-2]
                             active_stem = stem
                             self.te_contacts.append(tmpc[0])
@@ -301,7 +259,6 @@ class MDG_Stem :
                             """
                             tmpc = [active_stem.closing_pair()]
                             par = active_stem.parent
-                            # why -1 (s.above: -2)??
                             del par.children[-1]
                             self.te_contacts.append(tmpc[0])
                             active_stem = par
@@ -407,7 +364,6 @@ class MDG_Stem :
         return 0
 
     
-    ###
     def find_all_motifs(self, mol=None, min_stemsize=2, max_stemsize=1,
                         outp=sys.stdout):
 
@@ -472,28 +428,3 @@ def parseBracketString(s):
     return sorted(structure)
    
     
-###        
-def main(argv):
-    from collections import defaultdict
-    contacts = list(parseBracketString(sys.argv[1]))
-    structures = defaultdict(int)
-
-    x = MDG_Stem()
-
-    x.assemble(contacts, outp=DEFOUT)
-    for motif in x.find_all_motifs():
-        structures[motif[0]]+=len(motif[1:])
-        
-    e = contacts[0][0]
-    for a, b in contacts:
-        if a != e:
-            structures['Stems']+=1
-            e = a
-        e += 1 
-
-    from pprint import pprint
-    pprint(structures)
-    
-    return 0
-
-if __name__ == '__main__': main(sys.argv[1:])

@@ -10,17 +10,6 @@ import itertools
 from textwrap import wrap
 from collections import defaultdict
 
-def TriNcleotideComposition(sequence, base="ATGC"):
-    trincleotides = [nn1 + nn2 + nn3 for nn1 in base for nn2 in base for nn3 in base]
-    tnc_dict = {}
-    for triN in trincleotides:
-        tnc_dict[triN] = 0
-    for i in range(len(sequence) - 2):
-        tnc_dict[sequence[i:i + 3]] += 1
-    for key in tnc_dict:
-       tnc_dict[key] /= (len(sequence) - 2)
-    return tnc_dict
-
 class AbstractSequenceEncoder:
     ALLOWED_CHARACTERS = 'ATGC'
     
