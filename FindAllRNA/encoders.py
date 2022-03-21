@@ -2,9 +2,12 @@ from textwrap import wrap
 import numpy as np
 from shapes import MDG_Stem, parseBracketString
 from collections import defaultdict
-import RNA
 import sys
 from ushuffle import shuffle, Shuffler
+from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+
 
 
 BASE = "ATGC"
@@ -35,9 +38,6 @@ def shape_count(ss):
     if len(contacts) == 0:
         return structures
     
-    
-    
-
     x = MDG_Stem()
 
     x.assemble(contacts, outp=DEFOUT)
@@ -50,9 +50,6 @@ def shape_count(ss):
             structures['Stems']+=1
             e = a
         e += 1 
-
-    # from pprint import pprint
-    # pprint(structures)
     
     return structures
 
@@ -75,7 +72,7 @@ def pad(seqs):
 def randomize(seqs, n=1):
     shuffled = []
     for seq in seqs:
-        k = np.random.choice([2, 3])
+        k = np.random.choice([2, 3, 6])
         shuffler = Shuffler(str.encode(seq), k)
         for i in range(n):
             seqres = shuffler.shuffle()
@@ -90,11 +87,9 @@ if __name__ == '__main__':
     from pprint import pprint
     import pandas as pd
     
-    seq1 = "ATGATACTGCACCTTTCAGGTGTGGGAATGTAGGTCGATGCAGGGA"
-    print(" "*8+seq1+" "*8)
-    print(pad([seq1, seq1])[0])
-    print(pad([seq1, seq1])[1])
-    
+    records = list(SeqIO.parse('./sources/rfam250.fa', "fasta"))
+    rseqs = randomize([str(r.seq) for r in records])    
+    SeqIO.write([SeqRecord(Seq(r), id=f'seq_{idx}', description='random') for idx, r in enumerate(rseqs)], './sources/shuffled_rfam250.fa', 'fasta')    
     
     
     

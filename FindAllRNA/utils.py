@@ -5,14 +5,7 @@ import RNA
 import swifter
 from encoders import tri_nucleotide_composition, shape_count, randomize, pad, TRINUCLEOTIDES
 
-## Normalization of MFE with sq length https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0113380
-ref_table = pd.read_csv('Dataset_S1.txt', sep='\t').to_dict()
-EXPECTED_MFE = dict(zip(ref_table['L (nt)'], ref_table['MFE (kcal/mol)']))
 
-def normalize_mfe(seq, mfe, scale=1.0):
-    Lo = 8
-    L = len(seq)
-    return scale*(mfe - EXPECTED_MFE[L])/(L-Lo)
 
 def encode(filename="test.fasta", random_only=False, seq=None):
     if seq is not None:
@@ -68,25 +61,3 @@ def encode(filename="test.fasta", random_only=False, seq=None):
     df = df.reset_index()
     
     return df    
-
-
-
-
-
-# from pprint import pprint
-# # f = 'test.fasta'
-# # f = '/tmp/nfs.fa'
-# f = '/tmp/ncrna.fa'
-
-# df = encode(f, random_only=True)
-# print(df)
-# df.to_csv('ncrna_shuffled.csv', index = False)
-# print()
-
-# # df = encode(f, random_only=True)
-
-# # print(df)
-# # # df.to_csv('rfam_shuffled.csv', index = False)
-# # print()
-    
-    
