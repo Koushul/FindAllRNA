@@ -42,3 +42,8 @@ vignettes/*.pdf
 FindAllRNA/__pycache__
 .DS_Store
 
+FindAllRNA/folded/
+FindAllRNA/sources/
+FindAllRNA/mutated/
+
+variations.json
